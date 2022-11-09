@@ -1,6 +1,9 @@
 package org.acme;
 
 import io.opentracing.Tracer;
+import io.quarkus.mailer.Mail;
+import io.quarkus.mailer.Mailer;
+import io.quarkus.mailer.reactive.ReactiveMailer;
 import org.eclipse.microprofile.faulttolerance.CircuitBreaker;
 import org.eclipse.microprofile.metrics.MetricUnits;
 import org.eclipse.microprofile.metrics.annotation.Counted;
@@ -27,10 +30,16 @@ public class GreetingsResource {
     WorldClockService worldClockService;
 
     @Inject
+    Mailer mailer;
+
+    @Inject
+    ReactiveMailer reactiveMailer;
+
+    @Inject
     Tracer tracer;
 
     @Gauge(name = "Max Temp", description = "Max Temperature", unit = MetricUnits.NONE)
-    public Long getMaxTemperature(){
+    public Long getMaxTemperature() {
         return maxTemperature;
     }
 
@@ -48,8 +57,10 @@ public class GreetingsResource {
     )
     @Counted(name = "Name of Get Time", description = "Number of calls")
     public WorldClock getNow() {
+        WorldClock wc = worldClockService.getNow();
+        mailer.send(Mail.withText("clock@example.com", "Han consultado el tiempo", String.format("El tiempo es %s", wc.getCurrentDateTime())));
         tracer.activeSpan().setBaggageItem("time", "now");
-        return worldClockService.getNow();
+        return wc;
     }
 
 }
