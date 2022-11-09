@@ -1,5 +1,6 @@
 package org.acme;
 
+import org.eclipse.microprofile.faulttolerance.CircuitBreaker;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 import javax.inject.Inject;
@@ -20,6 +21,11 @@ public class GreetingsResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
+    @CircuitBreaker(
+            requestVolumeThreshold = 3,
+            failureRatio = .75,
+            delay = 1000
+    )
     public WorldClock getNow() {
         return worldClockService.getNow();
     }
