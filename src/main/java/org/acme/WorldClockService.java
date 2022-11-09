@@ -17,7 +17,7 @@ public interface WorldClockService {
     @GET
     @Path("/json/cet/now")
     @Produces(MediaType.APPLICATION_JSON)
-    @Retry(maxRetries = 3, delay = 1, delayUnit = ChronoUnit.SECONDS)
+    @Retry(maxRetries = 3, delay = 0, delayUnit = ChronoUnit.SECONDS)
     @Fallback(WorldClockFallback.class)
     WorldClock getNow();
 
